@@ -1,24 +1,30 @@
+
 document.addEventListener('DOMContentLoaded', function() {
 
     const addButton = document.getElementById('add-task-btn'); 
     const taskInput = document.getElementById('task-input'); 
-    const taskList = document.getElementById('task-list');
-
-    function loadTasks() {
-        const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-        storedTasks.forEach(taskText => addTask(taskText, false)); 
-    }
-
-    function saveTasks(tasks) {
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-    }
+    const taskList = document.getElementById('task-list'); 
 
     function getStoredTasks() {
         return JSON.parse(localStorage.getItem('tasks') || '[]');
     }
 
+    function saveStoredTasks(tasks) {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    function loadTasks() {
+        const storedTasks = getStoredTasks();
+        storedTasks.forEach(function(taskText) {
+            addTask(taskText, false);
+        });
+    }
+
     function addTask(taskText, save = true) {
-        if (taskText.trim() === '') {
+
+        taskText = taskText.trim();
+
+        if (taskText === '') {
             alert('Please enter a task.');
             return;
         }
@@ -32,21 +38,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
         removeBtn.onclick = function() {
             taskList.removeChild(li);
-            const tasks = getStoredTasks().filter((item) => item !== taskText);
-            saveTasks(tasks);
+            const tasks = getStoredTasks().filter(function(item) {
+                return item !== taskText;
+            });
+            saveStoredTasks(tasks);
         };
 
+   
         li.appendChild(removeBtn);
 
         taskList.appendChild(li);
 
+        taskInput.value = '';
+
         if (save) {
             const tasks = getStoredTasks();
             tasks.push(taskText);
-            saveTasks(tasks);
+            saveStoredTasks(tasks);
         }
-
-        taskInput.value = '';
     }
 
     addButton.addEventListener('click', function() {
